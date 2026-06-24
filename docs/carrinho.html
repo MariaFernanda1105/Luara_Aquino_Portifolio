@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrinho — Luara Aquino</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-row">
+    <a href="index.html" class="brand"><img src="assets/logo.svg" class="brand-mark" alt=""><span class="brand-name"><b>Luara</b>Aquino</span></a>
+    <button class="nav-toggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+    <ul class="nav-links">
+      <li><a href="index.html">Início</a></li>
+      <li><a href="galeria.html">Galeria de fotos</a></li>
+      <li><a href="portfolio.html">Portfólio</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li><a href="loja.html">Loja online</a></li>
+      <li><a href="termos.html">Termos e Condições</a></li>
+      <li class="dropdown">
+        <a href="#">Mais ▾</a>
+        <div class="dropdown-menu">
+          <a href="sobre.html">Biografia completa</a>
+          <a href="museu.html">Museu virtual</a>
+          <a href="carrinho.html" class="active">Meu carrinho</a>
+        </div>
+      </li>
+    </ul>
+    <div class="nav-right"><a href="carrinho.html" class="cart-link">🛒 Carrinho <span class="cart-badge">0</span></a></div>
+  </div>
+</header>
+
+<div class="page-hero"><div class="container">
+  <span class="eyebrow">Pedido</span>
+  <h1>Meu carrinho</h1>
+</div></div>
+
+<section class="section">
+  <div class="container" id="conteudo-carrinho"></div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div><div class="brand" style="margin-bottom:14px;"><img src="assets/logo.svg" class="brand-mark" alt=""><span class="brand-name" style="color:var(--creme)"><b style="color:var(--dourado)">Luara</b>Aquino</span></div>
+      <p style="color:var(--texto-suave);font-size:.92rem;max-width:320px;">Luciélia de Aquino Ramos — artista plástica, gestora cultural e servidora pública. Pioneira de Palmas, Tocantins.</p></div>
+    <div><h4>Navegação</h4><a href="portfolio.html">Portfólio</a><a href="museu.html">Museu virtual</a><a href="loja.html">Loja online</a><a href="galeria.html">Galeria de fotos</a></div>
+    <div><h4>Institucional</h4><a href="sobre.html">Biografia</a><a href="contato.html">Contato</a><a href="termos.html">Termos e Condições</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Luara Aquino. Todos os direitos reservados.</span><span>Palmas — Tocantins, Brasil</span></div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/script.js"></script>
+<script>
+function renderizarCarrinho(){
+  const itens = lerCarrinho();
+  const container = document.getElementById('conteudo-carrinho');
+  if (itens.length === 0) {
+    container.innerHTML = `
+      <div class="carrinho-vazio">
+        <p class="lede" style="margin:0 auto 20px;">Seu carrinho está vazio.</p>
+        <a href="loja.html" class="btn btn-primary">Ir para a loja</a>
+      </div>`;
+    return;
+  }
+  const linhas = itens.map(i => `
+    <tr>
+      <td>
+        <div class="item-produto">
+          <div class="item-thumb"><img src="${i.imagem}" alt="${i.nome}"></div>
+          <div><div class="item-nome">${i.nome}</div><div class="item-tipo">${i.tipo}</div></div>
+        </div>
+      </td>
+      <td>
+        <div class="qtd-control">
+          <button onclick="alterarQuantidade('${i.id}',-1)" aria-label="Diminuir">−</button>
+          <span>${i.qtd}</span>
+          <button onclick="alterarQuantidade('${i.id}',1)" aria-label="Aumentar">+</button>
+        </div>
+      </td>
+      <td>${formatarPreco(i.preco * i.qtd)}</td>
+      <td><a href="#" class="remover-item" onclick="removerDoCarrinho('${i.id}');return false;">Remover</a></td>
+    </tr>`).join('');
+
+  const total = totalCarrinho();
+  container.innerHTML = `
+    <table class="carrinho-tabela">
+      <thead><tr><th>Obra</th><th>Quantidade</th><th>Subtotal</th><th></th></tr></thead>
+      <tbody>${linhas}</tbody>
+    </table>
+    <div class="resumo-carrinho">
+      <div class="resumo-linha"><span>Itens</span><span>${contagemCarrinho()}</span></div>
+      <div class="resumo-linha"><span>Frete</span><span>A combinar</span></div>
+      <div class="resumo-linha total"><span>Total</span><span>${formatarPreco(total)}</span></div>
+      <button class="btn btn-gold" style="width:100%;margin-top:18px;justify-content:center;" onclick="finalizarPedido()">Finalizar pedido</button>
+      <a href="loja.html" class="btn btn-outline" style="width:100%;margin-top:10px;justify-content:center;">Continuar comprando</a>
+    </div>`;
+}
+
+function finalizarPedido(){
+  const itens = lerCarrinho();
+  if (itens.length === 0) return;
+  const resumo = itens.map(i => `• ${i.nome} (x${i.qtd}) — ${formatarPreco(i.preco*i.qtd)}`).join('%0A');
+  const corpo = `Olá, Luara! Gostaria de fazer o seguinte pedido:%0A%0A${resumo}%0A%0ATotal: ${formatarPreco(totalCarrinho())}`;
+  window.location.href = `mailto:luaraquino@gmail.com?subject=${encodeURIComponent('Pedido pelo site')}&body=${corpo}`;
+}
+
+renderizarCarrinho();
+</script>
+</body>
+</html>
